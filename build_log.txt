@@ -1,0 +1,43 @@
+
+> quantum-ai-terminal@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 1 errors:
+./src/components/ui/card.tsx:2:1
+Module not found: Can't resolve '@/lib/utils'
+[0m [90m 1 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mReact[39m [36mfrom[39m [32m"react"[39m
+[31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { cn } [36mfrom[39m [32m"@/lib/utils"[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 3 |[39m
+ [90m 4 |[39m [36mconst[39m [33mCard[39m [33m=[39m [33mReact[39m[33m.[39mforwardRef[33m<[39m
+ [90m 5 |[39m   [33mHTMLDivElement[39m[33m,[39m[0m
+
+Import map: aliased to relative './src/lib/utils' inside of [project]/
+
+
+Import traces:
+  Client Component Browser:
+    ./src/components/ui/card.tsx [Client Component Browser]
+    ./src/components/TradeControlPanel.tsx [Client Component Browser]
+    ./src/components/LeftSidebar.tsx [Client Component Browser]
+    ./src/components/LeftSidebar.tsx [Server Component]
+    ./src/app/dashboard/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/ui/card.tsx [Client Component SSR]
+    ./src/components/TradeControlPanel.tsx [Client Component SSR]
+    ./src/components/LeftSidebar.tsx [Client Component SSR]
+    ./src/components/LeftSidebar.tsx [Server Component]
+    ./src/app/dashboard/layout.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./src/components/ui/card.tsx:2:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

@@ -1,0 +1,54 @@
+
+> quantum-ai-terminal@0.1.0 lint
+> eslint
+
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\components\ChartView.tsx
+  71:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\components\ChatBox.tsx
+  66:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\components\RightPanel.tsx
+  4:10  warning  'Tabs' is defined but never used         @typescript-eslint/no-unused-vars
+  4:16  warning  'TabsTrigger' is defined but never used  @typescript-eslint/no-unused-vars
+  4:29  warning  'TabsContent' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\core\binance.ts
+  59:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\core\context.tsx
+  109:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\core\context.tsx:109:13
+  107 |     if (savedTrades) {
+  108 |         try {
+> 109 |             setTrades(JSON.parse(savedTrades));
+      |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  110 |         } catch(e) {}
+  111 |     }
+  112 |     if (savedBalance) {  react-hooks/set-state-in-effect
+  110:17  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\core\market.ts
+   52:51  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  163:18  warning  'e' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  187:21  warning  'e' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+  202:6   warning  React Hook useEffect has a missing dependency: 'connectionStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\src\core\simulation.tsx
+   80:6  warning  React Hook useEffect has a missing dependency: 'addLog'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  108:6  warning  React Hook useEffect has a missing dependency: 'addLog'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\jakkob\Desktop\WEB_STATIS\quantum-ai-terminal\tailwind.config.ts
+  1:1  warning  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+✖ 16 problems (5 errors, 11 warnings)
+
