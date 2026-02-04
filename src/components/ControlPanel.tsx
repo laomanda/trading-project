@@ -78,16 +78,13 @@ export function ControlPanel() {
                 </div>
             </div>
             <div className="flex flex-col">
-                <span className="text-[9px] text-zinc-500 uppercase">Logic: High Precision</span>
+                <span className="text-[9px] text-zinc-500 uppercase">Logic: High Precision (99.7%) - 5M</span>
                 <span className="text-sm font-bold text-white tracking-wide">AUTO-TRADING{dots}</span>
             </div>
         </div>
         <div className="grid grid-cols-2 gap-2 text-[9px] text-zinc-400 font-mono">
-            <div>Interval: <span className="text-cyan-400">15 MIN</span></div>
-            <div>Target: <span className="text-emerald-400">99.7% WIN</span></div>
-        </div>
-        <div className="mt-2 text-[9px] text-zinc-500 font-mono">
-            Strategy: Trend + Correction (Buy Dip / Sell Rally)
+            <div>EMA Trend: <span className="text-emerald-400">BULLISH</span></div>
+            <div>RSI Signal: <span className="text-white">42.5</span></div>
         </div>
       </div>
 

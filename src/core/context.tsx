@@ -79,7 +79,7 @@ const TerminalContext = createContext<TerminalContextType | undefined>(undefined
 
 export function TerminalProvider({ children }: { children: ReactNode }) {
   const [asset, setAssetRaw] = useState("BTCUSDT");
-  const [timeframe, setTimeframeRaw] = useState("1m");
+  const [timeframe, setTimeframeRaw] = useState("5m");
   const [connectionStatus, setConnectionStatus] = useState<TerminalContextType["connectionStatus"]>("CONNECTING");
   
   const [currentCandle, setCurrentCandle] = useState<Candle | null>(null);
@@ -186,7 +186,7 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
 
       setBalance(prev => prev + realizedPnL);
       setPosition(null);
-      setCooldownCounter(15); // 15-minute cooldown (15 candles on 1m TF)
+      setCooldownCounter(2); 
   }, []);
 
   const updatePositionPnL = useCallback((currentPrice: number) => {

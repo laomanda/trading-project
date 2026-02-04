@@ -44,8 +44,8 @@ export function detectSignal(candles: Candle[]): Signal {
   // We want to Buy the Dip (Correction)
   if (isUptrend) {
       // Condition: RSI was Oversold/Low (< 45) and is now turning up OR Price bounced off EMA50
-      // Simplification: RSI dipped below 50 and Price closes back above EMA9 (Momentum recovery)
-      const isDip = prevRsi < 55; // Was in lower half
+      // Simplification: RSI dipped below 45 (Strict Dip) and Price closes back above EMA9
+      const isDip = prevRsi < 45; // Stricter Dip
       const momentumRecovered = lastClose > lastEma9;
       
       if (isDip && momentumRecovered) {
@@ -53,7 +53,7 @@ export function detectSignal(candles: Candle[]): Signal {
              type: "LONG", 
              price: lastClose, 
              time: lastTime, 
-             reason: `TREND UP (Buy Dip): RSI ${lastRsi.toFixed(1)} < 55 & Price > EMA9` 
+             reason: `TREND UP (Buy Deep Dip): RSI ${lastRsi.toFixed(1)} < 45 & Price > EMA9` 
           };
       }
   }
@@ -62,8 +62,8 @@ export function detectSignal(candles: Candle[]): Signal {
   // We want to Sell the Rally (Correction)
   if (isDowntrend) {
       // Condition: RSI was Overbought/High (> 55) and is now turning down OR Price rejected ema50
-      // Simplification: RSI spiked above 50 and Price closes back below EMA9 (Momentum resume)
-      const isRally = prevRsi > 45; // Was in upper half
+      // Simplification: RSI spiked above 55 (Strict Rally) and Price closes back below EMA9
+      const isRally = prevRsi > 55; // Stricter Rally
       const momentumResumed = lastClose < lastEma9;
 
       if (isRally && momentumResumed) {
