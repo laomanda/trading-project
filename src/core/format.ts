@@ -5,11 +5,20 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(value: number) {
-  return new Intl.NumberFormat('en-US', {
+
+export const USDT_IDR_RATE = 16500;
+
+export function formatIDR(valueUSDT: number) {
+  const inIDR = valueUSDT * USDT_IDR_RATE;
+  return new Intl.NumberFormat('id-ID', {
     style: 'currency',
-    currency: 'USD',
-  }).format(value);
+    currency: 'IDR',
+    maximumFractionDigits: 0
+  }).format(inIDR);
+}
+
+export function formatCurrency(value: number) {
+  return formatIDR(value);
 }
 
 export function formatTime(timestamp: number) {

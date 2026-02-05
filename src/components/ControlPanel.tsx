@@ -1,7 +1,9 @@
 "use client";
 
 import { useTerminal } from "@/core/context";
-import { cn } from "@/core/format";
+
+import { cn, formatIDR } from "@/core/format";
+import { calcEMA, calcRSI } from "@/core/indicators";
 import { Activity, ArrowDown, ArrowUp, ChevronDown, Wand2, Power, Layers } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -14,11 +16,36 @@ export function ControlPanel() {
     currentCandle, history
   } = useTerminal();
 
+  // Calculate Indicators
+  const [indicators, setIndicators] = useState({ trend: "---", rsi: "---", isBullish: false });
+
+  useEffect(() => {
+    if (history.length < 50) return;
+    
+    const closes = history.map(c => c.close);
+    // Add current candle if it exists for latest data
+    if (currentCandle) closes.push(currentCandle.close);
+
+    const emaFast = calcEMA(closes, 21);
+    const emaSlow = calcEMA(closes, 65);
+    const rsi = calcRSI(closes, 25);
+
+    const lastEmaFast = emaFast[emaFast.length - 1];
+    const lastEmaSlow = emaSlow[emaSlow.length - 1];
+    const lastRsi = rsi[rsi.length - 1];
+
+    setIndicators({
+        trend: lastEmaFast > lastEmaSlow ? "BULLISH" : "BEARISH",
+        isBullish: lastEmaFast > lastEmaSlow,
+        rsi: lastRsi.toFixed(1)
+    });
+  }, [history, currentCandle]);
+
   const [tfOpen, setTfOpen] = useState(false);
   const [adviceLoading, setAdviceLoading] = useState(false);
   const [adviceText, setAdviceText] = useState("");
 
-  const formatIDR = (num: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+
 
   // Simulated AI Signal Status
   const [dots, setDots] = useState("");
@@ -78,13 +105,14 @@ export function ControlPanel() {
                 </div>
             </div>
             <div className="flex flex-col">
-                <span className="text-[9px] text-zinc-500 uppercase">Logic: High Precision (99.7%) - 5M</span>
-                <span className="text-sm font-bold text-white tracking-wide">AUTO-TRADING{dots}</span>
+                <span className="text-[9px] text-zinc-500 uppercase">Logic: Classic Scalper</span>
+                <span className="text-sm font-bold text-white tracking-wide">SCANNING{dots}</span>
             </div>
         </div>
+
         <div className="grid grid-cols-2 gap-2 text-[9px] text-zinc-400 font-mono">
-            <div>EMA Trend: <span className="text-emerald-400">BULLISH</span></div>
-            <div>RSI Signal: <span className="text-white">42.5</span></div>
+            <div>EMA Trend: <span className={cn(indicators.isBullish ? "text-emerald-400" : "text-rose-400")}>{indicators.trend}</span></div>
+            <div>RSI Signal: <span className="text-white">{indicators.rsi}</span></div>
         </div>
       </div>
 

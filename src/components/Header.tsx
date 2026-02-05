@@ -39,10 +39,7 @@ export function Header() {
             </Badge>
         </div>
         
-        <Button size="sm" variant="outline" className="h-8 gap-2 border-white/20 hover:bg-white hover:text-black transition-all group">
-            <Power className="w-4 h-4 group-hover:text-black text-white" />
-            <span className="font-mono text-xs uppercase">System Active</span>
-        </Button>
+
       </div>
     </header>
   );

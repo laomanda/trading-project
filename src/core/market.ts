@@ -189,6 +189,12 @@ export function useMarketData() {
                     const last = prev[prev.length - 1];
                     if (!last) return [candle];
                     
+                    // Prevent Time Travel (Crash Protection)
+                    if (candle.time < last.time) {
+                         // Likely late packet or conflict with simulation
+                         return prev;
+                    }
+
                     if (candle.time === last.time) {
                         const newList = [...prev];
                         newList[newList.length - 1] = candle;

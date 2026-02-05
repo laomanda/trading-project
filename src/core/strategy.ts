@@ -15,66 +15,44 @@ export function detectSignal(candles: Candle[]): Signal {
   const lastClose = closes[closes.length - 1];
   const lastTime = candles[candles.length - 1].time;
 
-  // Parameters for High Accuracy "Trend + Correction" Strategy
-  const emaFastPeriod = 9;
-  const emaTrendPeriod = 50;
-  const emaMajorTrendPeriod = 200;
-  const rsiPeriod = 14;
+  // Parameters
+  const emaFastPeriod = 21;
+  const emaSlowPeriod = 65;
+  const rsiFastPeriod = 25;
+  const rsiSlowPeriod = 100;
 
-  // Calculate Indicators
-  const ema9 = calcEMA(closes, emaFastPeriod);
-  const ema50 = calcEMA(closes, emaTrendPeriod);
-  const ema200 = calcEMA(closes, emaMajorTrendPeriod);
-  const rsi = calcRSI(closes, rsiPeriod);
+  // Calculate
+  const ema21 = calcEMA(closes, emaFastPeriod);
+  const ema65 = calcEMA(closes, emaSlowPeriod);
+  const rsi25 = calcRSI(closes, rsiFastPeriod);
+  const rsi100 = calcRSI(closes, rsiSlowPeriod);
 
-  // Get recent values
-  const lastEma9 = ema9[ema9.length - 1];
-  const lastEma50 = ema50[ema50.length - 1];
-  const lastEma200 = ema200[ema200.length - 1];
-  const lastRsi = rsi[rsi.length - 1];
-  const prevRsi = rsi[rsi.length - 2];
+  // Get last values
+  const lastEma21 = ema21[ema21.length - 1];
+  const lastEma65 = ema65[ema65.length - 1];
+  const lastRsi25 = rsi25[rsi25.length - 1];
+  const lastRsi100 = rsi100[rsi100.length - 1];
 
-  // Helper: Detect Trend
-  const isUptrend = lastEma50 > lastEma200;
-  const isDowntrend = lastEma50 < lastEma200;
-
-  // STRATEGY: "Correction Scalper" (Win Rate Optimized)
-  
-  // 1. SETUP: UPTREND
-  // We want to Buy the Dip (Correction)
-  if (isUptrend) {
-      // Condition: RSI was Oversold/Low (< 45) and is now turning up OR Price bounced off EMA50
-      // Simplification: RSI dipped below 45 (Strict Dip) and Price closes back above EMA9
-      const isDip = prevRsi < 45; // Stricter Dip
-      const momentumRecovered = lastClose > lastEma9;
-      
-      if (isDip && momentumRecovered) {
-          return { 
-             type: "LONG", 
-             price: lastClose, 
-             time: lastTime, 
-             reason: `TREND UP (Buy Deep Dip): RSI ${lastRsi.toFixed(1)} < 45 & Price > EMA9` 
-          };
-      }
+  // Logic: Classic Scalper
+  // LONG: EMA21 > EMA65 && RSI_Fast > RSI_Slow && Close > EMA21
+  if (lastEma21 > lastEma65 && lastRsi25 > lastRsi100 && lastClose > lastEma21) {
+      return { 
+          type: "LONG", 
+          price: lastClose, 
+          time: lastTime,
+          reason: `EMA${emaFastPeriod} > EMA${emaSlowPeriod} & RSI${rsiFastPeriod} > RSI${rsiSlowPeriod}`
+      };
   }
 
-  // 2. SETUP: DOWNTREND
-  // We want to Sell the Rally (Correction)
-  if (isDowntrend) {
-      // Condition: RSI was Overbought/High (> 55) and is now turning down OR Price rejected ema50
-      // Simplification: RSI spiked above 55 (Strict Rally) and Price closes back below EMA9
-      const isRally = prevRsi > 55; // Stricter Rally
-      const momentumResumed = lastClose < lastEma9;
-
-      if (isRally && momentumResumed) {
-          return { 
-             type: "SHORT", 
-             price: lastClose, 
-             time: lastTime, 
-             reason: `TREND DOWN (Sell Rally): RSI ${lastRsi.toFixed(1)} > 45 & Price < EMA9` 
-          };
-      }
+  // SHORT: EMA21 < EMA65 && RSI_Fast < RSI_Slow && Close < EMA21
+  if (lastEma21 < lastEma65 && lastRsi25 < lastRsi100 && lastClose < lastEma21) {
+      return { 
+          type: "SHORT", 
+          price: lastClose, 
+          time: lastTime,
+          reason: `EMA${emaFastPeriod} < EMA${emaSlowPeriod} & RSI${rsiFastPeriod} < RSI${rsiSlowPeriod}`
+      };
   }
 
-  return { type: "NEUTRAL", price: lastClose, time: lastTime, reason: "Waiting for Setup" };
+  return { type: "NEUTRAL", price: lastClose, time: lastTime, reason: "No Signal" };
 }

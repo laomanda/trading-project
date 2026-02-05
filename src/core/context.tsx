@@ -79,7 +79,7 @@ const TerminalContext = createContext<TerminalContextType | undefined>(undefined
 
 export function TerminalProvider({ children }: { children: ReactNode }) {
   const [asset, setAssetRaw] = useState("BTCUSDT");
-  const [timeframe, setTimeframeRaw] = useState("5m");
+  const [timeframe, setTimeframeRaw] = useState("1m");
   const [connectionStatus, setConnectionStatus] = useState<TerminalContextType["connectionStatus"]>("CONNECTING");
   
   const [currentCandle, setCurrentCandle] = useState<Candle | null>(null);

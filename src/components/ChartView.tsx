@@ -1,15 +1,18 @@
 "use client";
 
-import { createChart, ColorType, ISeriesApi, IChartApi, CandlestickSeries } from 'lightweight-charts';
+import { createChart, ColorType, ISeriesApi, IChartApi, CandlestickSeries, LineSeries } from 'lightweight-charts';
 import React, { useEffect, useRef } from 'react';
 import { useMarketData } from '@/core/market';
 import { useTerminal } from '@/core/context';
 import { cn } from '@/core/format';
+import { calcEMA, calcRSI, isHammer, isShootingStar, isBullishEngulfing, isBearishEngulfing } from '@/core/indicators';
 
 export const ChartView = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const ema21Ref = useRef<ISeriesApi<"Line"> | null>(null);
+  const ema65Ref = useRef<ISeriesApi<"Line"> | null>(null);
   
   const { data, currentCandle } = useMarketData();
   const { asset, connectionStatus } = useTerminal();
@@ -19,36 +22,62 @@ export const ChartView = () => {
     if (chartContainerRef.current && !chartRef.current) {
       const chart = createChart(chartContainerRef.current, {
         layout: {
-          background: { type: ColorType.Solid, color: '#000000' }, // True Black
-          textColor: '#737373', // Neutral Gray (Zinc 500)
-          fontFamily: 'Manrope, sans-serif',
+          background: { type: ColorType.Solid, color: '#131722' }, // TradingView Dark Bkg
+          textColor: '#d1d4dc',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif',
         },
         grid: {
-          vertLines: { color: '#1a1a1a' },
-          horzLines: { color: '#1a1a1a' },
+          vertLines: { color: '#1e222d' },
+          horzLines: { color: '#1e222d' },
         },
         width: chartContainerRef.current.clientWidth,
         height: chartContainerRef.current.clientHeight,
         timeScale: {
             timeVisible: true,
-            borderColor: '#262626',
+            borderColor: '#2B2B43',
         },
         rightPriceScale: {
-            borderColor: '#262626',
+            borderColor: '#2B2B43',
+        },
+        crosshair: {
+            mode: 1, // CrosshairMode.Normal
+            vertLine: {
+                width: 1,
+                color: '#758696',
+                style: 3, // LineStyle.Dashed
+                labelBackgroundColor: '#758696',
+            },
+            horzLine: {
+                width: 1,
+                color: '#758696',
+                style: 3, // LineStyle.Dashed
+                labelBackgroundColor: '#758696',
+            },
         },
       });
 
       const series = chart.addSeries(CandlestickSeries, {
-        upColor: '#26a69a', 
-        downColor: '#ef5350', 
-        borderUpColor: '#26a69a',
-        borderDownColor: '#ef5350',
-        wickUpColor: '#26a69a',
-        wickDownColor: '#ef5350',
+        upColor: '#089981', // TV Green
+        downColor: '#F23645', // TV Red
+        borderUpColor: '#089981',
+        borderDownColor: '#F23645',
+        wickUpColor: '#089981',
+        wickDownColor: '#F23645',
       });
+      
+      console.log("Series created:", series);
+      console.log("setMarkers type:", typeof (series as any).setMarkers);
+
+      // Add EMA Indicators
+
+      // Add EMA Indicators
+      const ema21Series = chart.addSeries(LineSeries, { color: '#2962FF', lineWidth: 1, title: 'EMA 21' });
+      const ema65Series = chart.addSeries(LineSeries, { color: '#E91E63', lineWidth: 2, title: 'EMA 65' }); // Thicker slow EMA
 
       chartRef.current = chart;
       seriesRef.current = series;
+      ema21Ref.current = ema21Series;
+      ema65Ref.current = ema65Series;
 
       const handleResize = () => {
         if (chartContainerRef.current) {
@@ -81,21 +110,104 @@ export const ChartView = () => {
         chartRef.current = null;
       };
     }
-  }, []); // Empty dependency mainly, or if we want to recreate on drastic layout changes
+  }, []); // Empty dependency mainly
 
-  // 2. Load Historical Data
+  // 2. Load Historical Data & Calc Indicators
   useEffect(() => {
       if (seriesRef.current && data.length > 0) {
-          seriesRef.current.setData(data as any);
+          // Sort data to prevent lightweight-charts assertion error
+          const sortedData = [...data].sort((a, b) => a.time - b.time);
+          seriesRef.current.setData(sortedData as any);
+
+          // Calculate EMAs
+          const closes = sortedData.map(c => c.close);
+          const ema21Values = calcEMA(closes, 21);
+          const ema65Values = calcEMA(closes, 65);
+          const rsiValues = calcRSI(closes, 14); 
+
+          // Calc Markers (High Precision Reversal)
+          const markers: any[] = [];
+          
+          for (let i = 2; i < sortedData.length; i++) {
+              const curr = sortedData[i];
+              const prev = sortedData[i-1];
+              const rsi = rsiValues[i];
+
+              if (!curr || !prev || isNaN(rsi)) continue;
+
+              // BULLISH REVERSAL (Oversold + Pattern)
+              if (rsi < 32) {
+                  const hammer = isHammer(curr.open, curr.close, curr.high, curr.low);
+                  const engulf = isBullishEngulfing({open: curr.open, close: curr.close}, {open: prev.open, close: prev.close});
+                  
+                  if (hammer || engulf) {
+                      markers.push({
+                          time: curr.time,
+                          position: 'belowBar',
+                          color: '#089981', // Green
+                          shape: 'arrowUp',
+                          text: 'BUY',
+                          size: 2
+                      });
+                  }
+              }
+
+              // BEARISH REVERSAL (Overbought + Pattern)
+              if (rsi > 68) {
+                  const star = isShootingStar(curr.open, curr.close, curr.high, curr.low);
+                  const engulf = isBearishEngulfing({open: curr.open, close: curr.close}, {open: prev.open, close: prev.close});
+
+                  if (star || engulf) {
+                      markers.push({
+                          time: curr.time,
+                          position: 'aboveBar',
+                          color: '#F23645', // Red
+                          shape: 'arrowDown',
+                          text: 'SELL',
+                          size: 2
+                      });
+                  }
+              }
+          }
+          
+          if (typeof (seriesRef.current as any).setMarkers === 'function') {
+             (seriesRef.current as any).setMarkers(markers);
+          } else {
+             console.warn("setMarkers is missing on series object!", seriesRef.current);
+          }
+
+          // Map back to time/value
+          const ema21Data = sortedData.map((d, i) => ({ time: d.time, value: ema21Values[i] })).filter(d => !isNaN(d.value));
+          const ema65Data = sortedData.map((d, i) => ({ time: d.time, value: ema65Values[i] })).filter(d => !isNaN(d.value));
+
+          ema21Ref.current?.setData(ema21Data as any);
+          ema65Ref.current?.setData(ema65Data as any);
       }
   }, [data]);
 
   // 3. Realtime Updates
   useEffect(() => {
-    if (seriesRef.current && currentCandle) {
+    if (seriesRef.current && currentCandle && data.length > 0) {
         seriesRef.current.update(currentCandle as any);
+
+        // Update Indicators
+        // Needs the full array to be accurate, but for 1 tick update we can approximate or recalc last
+        // Optimization: Recalc only last few points? 
+        // For accurate EMA, we need history.
+        // Let's grab history + current
+        
+        const allCloses = [...data.map(c => c.close), currentCandle.close];
+        const lastIndex = allCloses.length - 1;
+        
+        // Quick EMA calc for last point only (Optimization possible but let's re-use calcEMA for safety first)
+        // Note: calcEMA is full array. Calling it every tick on 500 items is fine (JS is fast).
+        const ema21 = calcEMA(allCloses, 21);
+        const ema65 = calcEMA(allCloses, 65);
+
+        ema21Ref.current?.update({ time: currentCandle.time, value: ema21[lastIndex] } as any);
+        ema65Ref.current?.update({ time: currentCandle.time, value: ema65[lastIndex] } as any);
     }
-  }, [currentCandle]);
+  }, [currentCandle, data]);
 
   const { position } = useTerminal();
   const positionLinesRef = useRef<any[]>([]);
@@ -111,8 +223,8 @@ export const ChartView = () => {
       if (seriesRef.current && position) {
           const entryLine = seriesRef.current.createPriceLine({
               price: position.entryPrice,
-              color: '#3b82f6',
-              lineWidth: 2,
+              color: '#2962FF', // TV Blue
+              lineWidth: 1,
               lineStyle: 0, // Solid
               axisLabelVisible: true,
               title: `ENTRY ${position.side}`,
@@ -120,18 +232,18 @@ export const ChartView = () => {
 
           const tpLine = seriesRef.current.createPriceLine({
               price: position.tp,
-              color: '#10b981', // Emerald
+              color: '#089981', // TV Green
               lineWidth: 1,
-              lineStyle: 2, // Dashed
+              lineStyle: 1, // Dotted
               axisLabelVisible: true,
               title: 'TP',
           });
 
           const slLine = seriesRef.current.createPriceLine({
               price: position.sl,
-              color: '#ef4444', // Red
+              color: '#F23645', // TV Red
               lineWidth: 1,
-              lineStyle: 2, // Dashed
+              lineStyle: 1, // Dotted
               axisLabelVisible: true,
               title: 'SL',
           });
