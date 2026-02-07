@@ -37,16 +37,6 @@ export function RightPanel() {
             {activeTab === "logs" && <LogsPanel />}
             {activeTab === "trades" && (
                 <div className="h-full flex flex-col">
-                     <div className="p-4 grid grid-cols-2 gap-4 border-b border-white/5 bg-zinc-900/20">
-                         <div className="flex flex-col">
-                             <span className="text-[9px] text-zinc-500 uppercase tracking-widest">Winrate</span>
-                             <span className="text-lg font-mono text-emerald-500 font-bold">68.5%</span>
-                         </div>
-                         <div className="flex flex-col text-right">
-                             <span className="text-[9px] text-zinc-500 uppercase tracking-widest">Total PnL</span>
-                             <span className="text-lg font-mono text-white font-bold">+$4,250</span>
-                         </div>
-                     </div>
                      <div className="flex-1 overflow-auto">
                         <TradeHistory />
                      </div>

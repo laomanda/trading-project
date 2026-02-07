@@ -6,6 +6,7 @@ import { useMarketData } from '@/core/market';
 import { useTerminal } from '@/core/context';
 import { cn } from '@/core/format';
 import { calcEMA, calcRSI, isHammer, isShootingStar, isBullishEngulfing, isBearishEngulfing } from '@/core/indicators';
+import { playSignalAlert } from '@/core/sound';
 
 export const ChartView = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -13,8 +14,10 @@ export const ChartView = () => {
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const ema21Ref = useRef<ISeriesApi<"Line"> | null>(null);
   const ema65Ref = useRef<ISeriesApi<"Line"> | null>(null);
+  const lastAlertTime = useRef<number>(0);
   
   const { data, currentCandle } = useMarketData();
+
   const { asset, connectionStatus } = useTerminal();
 
   // 1. Initialize Chart (Once)
@@ -175,6 +178,19 @@ export const ChartView = () => {
           } else {
              console.warn("setMarkers is missing on series object!", seriesRef.current);
           }
+          
+          // Audio Alert Logic
+          const lastMarker = markers[markers.length - 1];
+          if (lastMarker) {
+              // Only alert if the marker is on the latest candle (or the one just closed)
+              // and we haven't alerted for this time yet.
+              const isRecent = lastMarker.time >= sortedData[sortedData.length - 2].time; // Allow last 2 candles
+              if (isRecent && lastMarker.time > lastAlertTime.current) {
+                  playSignalAlert();
+                  lastAlertTime.current = Number(lastMarker.time);
+                  console.log("Signal Alert Triggered for", lastMarker.text);
+              }
+          }
 
           // Map back to time/value
           const ema21Data = sortedData.map((d, i) => ({ time: d.time, value: ema21Values[i] })).filter(d => !isNaN(d.value));
@@ -204,8 +220,11 @@ export const ChartView = () => {
         const ema21 = calcEMA(allCloses, 21);
         const ema65 = calcEMA(allCloses, 65);
 
-        ema21Ref.current?.update({ time: currentCandle.time, value: ema21[lastIndex] } as any);
-        ema65Ref.current?.update({ time: currentCandle.time, value: ema65[lastIndex] } as any);
+        const val21 = ema21[lastIndex];
+        const val65 = ema65[lastIndex];
+
+        if (!isNaN(val21)) ema21Ref.current?.update({ time: currentCandle.time, value: val21 } as any);
+        if (!isNaN(val65)) ema65Ref.current?.update({ time: currentCandle.time, value: val65 } as any);
     }
   }, [currentCandle, data]);
 

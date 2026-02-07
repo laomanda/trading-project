@@ -27,22 +27,22 @@ export function TradeHistory() {
               </Button>
           </div>
           
-          <div className="grid grid-cols-3 gap-2">
-              <div className="bg-zinc-900/50 p-2 rounded border border-white/5">
-                  <span className="block text-[9px] text-zinc-500 uppercase">Winrate</span>
-                  <span className={cn("text-sm font-mono font-bold", stats.winrate >= 50 ? "text-emerald-400" : "text-rose-400")}>
-                      {stats.winrate.toFixed(1)}%
-                  </span>
-              </div>
-              <div className="bg-zinc-900/50 p-2 rounded border border-white/5">
-                  <span className="block text-[9px] text-zinc-500 uppercase">Total PnL</span>
-                  <span className={cn("text-sm font-mono font-bold", stats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400")}>
+          <div className="grid grid-cols-2 gap-2">
+              <div className="col-span-2 bg-zinc-900/50 p-3 rounded border border-white/5 flex justify-between items-center">
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Total PnL</span>
+                  <span className={cn("text-base font-mono font-bold tracking-tight", stats.totalPnL >= 0 ? "text-emerald-400" : "text-rose-400")}>
                       {formatCurrency(stats.totalPnL)}
                   </span>
               </div>
               <div className="bg-zinc-900/50 p-2 rounded border border-white/5">
-                  <span className="block text-[9px] text-zinc-500 uppercase">Trades</span>
-                  <span className="text-sm font-mono font-bold text-white">
+                  <span className="block text-[9px] text-zinc-500 uppercase mb-1">Winrate</span>
+                  <span className={cn("text-xs font-mono font-bold", stats.winrate >= 50 ? "text-emerald-400" : "text-rose-400")}>
+                      {stats.winrate.toFixed(1)}%
+                  </span>
+              </div>
+              <div className="bg-zinc-900/50 p-2 rounded border border-white/5">
+                  <span className="block text-[9px] text-zinc-500 uppercase mb-1">Trades</span>
+                  <span className="text-xs font-mono font-bold text-white">
                       {stats.tradeCount}
                   </span>
               </div>

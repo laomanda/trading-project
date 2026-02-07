@@ -31,11 +31,12 @@ export function ChatBox() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => { // Renamed from sendMessage
-    if (!input.trim()) return;
+  const handleSend = async (msgText?: string) => { // Renamed from sendMessage
+    const textToSend = msgText || input;
+    if (!textToSend.trim()) return;
     
     // Optimistic Update
-    const userMsg: Message = { role: 'user', content: input };
+    const userMsg: Message = { role: 'user', content: textToSend };
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true); // Updated loading state
@@ -104,24 +105,33 @@ export function ChatBox() {
       </div>
 
       <div className="p-4 bg-black border-t border-zinc-900">
-        <div className="flex gap-2 relative">
-          <input
-            className="flex-1 bg-zinc-900 text-white placeholder-zinc-600 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-700 font-mono"
-            placeholder="Input command or query..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            disabled={isLoading}
-          />
-          <Button 
-            size="icon" 
-            variant="default" // White button
-            className="absolute right-1 top-1 h-9 w-9 rounded-md transition-all hover:scale-105"
-            onClick={handleSend}
-            disabled={isLoading}
-          >
-            <Send className="w-4 h-4 text-black" />
-          </Button>
+        <div className="grid grid-cols-1 gap-2">
+            <h3 className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold mb-1">RECOMMENDED QUERIES</h3>
+            <div className="grid grid-cols-2 gap-2">
+                {[
+                    "📊 Analyze Trend",
+                    "🎯 Key Levels",
+                    "🔮 Next 15m Prediction",
+                    "⚠️ Risk Assessment"
+                ].map(q => (
+                    <button
+                        key={q}
+                        onClick={() => { setInput(q); handleSend(q); }}
+                        disabled={isLoading}
+                        className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 text-[10px] py-3 rounded-lg transition-all text-left px-3 font-medium flex items-center gap-2 group disabled:opacity-50"
+                    >
+                        {isLoading ? <span className="w-2 h-2 rounded-full bg-zinc-600 animate-pulse" /> : <span className="w-2 h-2 rounded-full bg-emerald-500 group-hover:bg-emerald-400 transition-colors" />}
+                        {q.replace(/^[^\s]+\s/, '')}
+                    </button>
+                ))}
+            </div>
+             <button
+                onClick={() => { setInput("🐋 Whale Activity Alert"); handleSend("🐋 Whale Activity Alert"); }}
+                disabled={isLoading}
+                className="w-full bg-indigo-950/30 hover:bg-indigo-900/40 border border-indigo-500/20 hover:border-indigo-500/50 text-indigo-300 hover:text-indigo-200 text-[10px] py-2 rounded-lg transition-all font-bold uppercase tracking-wide disabled:opacity-50"
+            >
+                🐋 Detect Whale Activity
+            </button>
         </div>
       </div>
     </div>

@@ -26,17 +26,38 @@ export async function POST(req: NextRequest) {
     const currentPrice = lastCloses[lastCloses.length - 1];
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // Fallback Mock Logic
+    // Enhanced Fallback Mock Logic
     const generateMockAdvice = () => {
+         const last = lastCloses[lastCloses.length - 1];
+         const prev = lastCloses[lastCloses.length - 5] || last;
+         const diff = last - prev;
          const isProfit = pnl > 0;
-         const trend = lastCloses[lastCloses.length - 1] > lastCloses[lastCloses.length - 5] ? "up" : "down";
+         const trend = diff > 0 ? "UP" : "DOWN";
          
+         // Randomizer for variety
+         const r = Math.random();
+
          if (isProfit) {
-             return side === "LONG" && trend === "up" 
-                 ? "HOLD: Tren masih kuat naik, biarkan profit berjalan. (AI: Simulated)"
-                 : "AMBIL PROFIT: Tren mulai melemah, amankan keuntungan sekarang. (AI: Simulated)";
+             if (side === "LONG" && trend === "UP") {
+                 return r > 0.5 
+                    ? "HOLD: Momentum bullish masih kuat. Biarkan profit maksimal, tapi naikkan SL ke Break Even." 
+                    : "TAHAN: Struktur pasar masih mendukung kenaikan. Target TP belum tercapai.";
+             } else if (side === "SHORT" && trend === "DOWN") {
+                 return r > 0.5
+                    ? "HOLD: Tekanan jual masih dominan. Potensi profit lebih besar masih terbuka."
+                    : "TAHAN: Jangan buru-buru close, bearish divergence masih valid.";
+             } else {
+                 return "TAKE PROFIT: Tren mulai berlawanan arah. Amankan profit sekarang sebelum berbalik.";
+             }
          } else {
-             return "TAHAN: Indikator menunjukkan potensi rebound jangka pendek. (AI: Simulated)";
+             // Losing Position
+             if ((side === "LONG" && trend === "DOWN") || (side === "SHORT" && trend === "UP")) {
+                 return r > 0.5
+                    ? "CUT LOSS: Setup invalid. Jangan menahan posisi melawan tren utama."
+                    : "WARNING: Harga bergerak melawan posisi Anda. Pertimbangkan tutup manual jika tembus support/resisten.";
+             } else {
+                 return "WAIT: Ini hanya koreksi wajar. Setup masih valid selama tidak kena SL.";
+             }
          }
     };
 
@@ -46,19 +67,38 @@ export async function POST(req: NextRequest) {
 
     // Real Gemini API Call
     try {
-        const prompt = `
-        Context: Active Trade Advice
-        Asset: ${symbol}
-        Position: ${side}
-        Entry Price: ${entry}
-        Current Price: ${currentPrice}
-        Floating PnL: ${pnl} (Unrealized)
-        Recent Trend (Last 10): ${JSON.stringify(lastCloses.slice(-10))}
-        
-        Instruction: Provide a recommendation in Bahasa Indonesia (1-2 sentences). Should the user HOLD, CLOSE, or adjust SL? Be decisive based on the trend.
-            `;
+        const generationConfig = {
+            temperature: 1.0, // Higher creativity for advice
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 150,
+        };
 
-        const result = await model.generateContent(prompt);
+        const prompt = `
+        Role: Quantum AI Trading Assistant.
+        Task: Analyze active trade and give 1 sentence advice.
+        Language: Bahasa Indonesia.
+        
+        Trade Context:
+        - Asset: ${symbol}
+        - Side: ${side}
+        - Entry: ${entry}
+        - Current Price: ${currentPrice}
+        - PnL: ${pnl.toFixed(2)} (Unrealized)
+        - Trend (Last 10 candles): ${JSON.stringify(lastCloses.slice(-10))}
+        
+        Instructions:
+        - Be decisive: HOLD, CLOSE, or ADJUST SL.
+        - If PnL is negative but trend looks like it might reverse back, say WAIT.
+        - If PnL is positive but trend weakens, say TAKE PROFIT.
+        - Use professional tone but varied vocabulary.
+        `;
+
+        const result = await model.generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig,
+        });
+
         const response = await result.response;
         const text = response.text();
 

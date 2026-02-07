@@ -85,7 +85,7 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
   const [currentCandle, setCurrentCandle] = useState<Candle | null>(null);
   const [history, setHistory] = useState<Candle[]>([]);
 
-  const [balance, setBalance] = useState(50000); 
+  const [balance, setBalance] = useState(10000); // 10k USDT (~165 Juta IDR) 
   const [position, setPosition] = useState<Position | null>(null);
   const [lastSignal, setLastSignal] = useState<Signal | null>(null);
   const [cooldownCounter, setCooldownCounter] = useState(0);
@@ -161,18 +161,26 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
+
+
   const closePosition = useCallback((price: number, reason: string = "MANUAL") => {
       const pos = positionRef.current;
       if (!pos) return;
       
+      // Add Slippage / Spread Simulation (0.02% - 0.05% variance)
+      // This makes PnL look more like real market execution
+      const volatility = 0.0005; // 0.05%
+      const slippage = price * (Math.random() - 0.5) * volatility;
+      const executionPrice = price + slippage;
+
       const multiplier = pos.side === "LONG" ? 1 : -1;
-      const rawPnlPerc = (price - pos.entryPrice) / pos.entryPrice * multiplier;
+      const rawPnlPerc = (executionPrice - pos.entryPrice) / pos.entryPrice * multiplier;
       const realizedPnL = pos.size * pos.leverage * rawPnlPerc; // Gross PnL
 
       // Create Record
       const newTrade: Trade = {
           ...pos,
-          exitPrice: price,
+          exitPrice: executionPrice,
           exitTime: Date.now(),
           pnl: realizedPnL,
           reason
@@ -209,7 +217,7 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
   const resetHistory = useCallback(() => {
       setTrades([]);
       localStorage.removeItem("qai_trades");
-      setBalance(50000); // Reset Balance too? User said "Reset History". Usually implies stats. I'll reset balance to default for simulation sake.
+      setBalance(10000); // Reset Balance too? User said "Reset History". Usually implies stats. I'll reset balance to default for simulation sake.
   }, []);
 
   // Stats derivation
