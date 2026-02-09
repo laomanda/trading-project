@@ -148,6 +148,8 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
       const tp = side === "LONG" ? price * (1 + tpPerc) : price * (1 - tpPerc);
       const sl = side === "LONG" ? price * (1 - slPerc) : price * (1 + slPerc);
 
+      import('./sound').then(mod => mod.playSignalAlert()); // Lazy load sound trigger
+
       setPosition({
           id: Date.now().toString(),
           side,
@@ -195,6 +197,8 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
       setBalance(prev => prev + realizedPnL);
       setPosition(null);
       setCooldownCounter(2); 
+
+      import('./sound').then(mod => mod.stopSignalAlert()); // Stop sound on close
   }, []);
 
   const updatePositionPnL = useCallback((currentPrice: number) => {

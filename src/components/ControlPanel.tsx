@@ -4,8 +4,9 @@ import { useTerminal } from "@/core/context";
 
 import { cn, formatIDR } from "@/core/format";
 import { calcEMA, calcRSI } from "@/core/indicators";
-import { Activity, ArrowDown, ArrowUp, ChevronDown, Wand2, Power, Layers } from "lucide-react";
+import { Activity, ArrowDown, ArrowUp, ChevronDown, Wand2, Power, Layers, Volume2, VolumeX } from "lucide-react";
 import { useState, useEffect } from "react";
+import { getSoundEnabled } from "@/core/sound"; // Ensure this is exported or just use local logic if lazy loading. Since we lazy load in click, we might need to lazy load init too? No, let's import top level for UI state.
 
 export function ControlPanel() {
   const { 
@@ -18,6 +19,13 @@ export function ControlPanel() {
 
   // Calculate Indicators
   const [indicators, setIndicators] = useState({ trend: "---", rsi: "---", isBullish: false });
+
+  // Sound State
+  const [soundOn, setSoundOn] = useState(true);
+  useEffect(() => {
+      // Sync with localStorage on mount
+      import('@/core/sound').then(mod => setSoundOn(mod.getSoundEnabled()));
+  }, []);
 
   useEffect(() => {
     if (history.length < 50) return;
@@ -110,9 +118,25 @@ export function ControlPanel() {
             </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-[9px] text-zinc-400 font-mono">
+        <div className="grid grid-cols-2 gap-2 text-[9px] text-zinc-400 font-mono items-center">
             <div>EMA Trend: <span className={cn(indicators.isBullish ? "text-emerald-400" : "text-rose-400")}>{indicators.trend}</span></div>
-            <div>RSI Signal: <span className="text-white">{indicators.rsi}</span></div>
+            <div className="flex justify-end">
+                <button 
+                    onClick={() => {
+                        import('@/core/sound').then(mod => {
+                            const newState = !mod.getSoundEnabled();
+                            mod.setSoundEnabled(newState);
+                            // Force re-render to update icon (using local state trick or just rely on react)
+                            // Better: use local state for UI sync
+                            setSoundOn(newState);
+                        });
+                    }}
+                    className="flex items-center gap-1 hover:text-white transition-colors"
+                >
+                    {soundOn ? <Volume2 className="w-3 h-3 text-emerald-400" /> : <VolumeX className="w-3 h-3 text-zinc-600" />}
+                    <span>{soundOn ? "ON" : "OFF"}</span>
+                </button>
+            </div>
         </div>
       </div>
 

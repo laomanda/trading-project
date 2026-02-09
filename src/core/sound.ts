@@ -1,16 +1,46 @@
+// Custom Alert Sound
+const PING_SOUND = "/alert/ingatan.mp3";
 
-// Simple Base64 Ping Sound (Small and embedded for reliability)
-// A short "Ding" / "Ping" sound
-const PING_SOUND = "data:audio/mp3;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWfkWgAI0wWs/ItAAAG1ineAAAB3ynAAAAAAAA758AAARDkssQwFWHdGpvaraZ5s54tmRGMQDw65V6/ORjqlMnSETxBlTM6WSNM7wcMDTo6/ORryNt4ieGw6RfWOPPv4I6kgzUqaUip7msrb3/mxJ25+zu4lfsKBhqaNsGdUvalvJ5RABqJqOXM8MxGTBQ6fDcjp84wmEjQY9ENcvlGdYOjuKt6FuyxkqZ66s5nONc9jhLzZV6wd8jl9K1IVagxxjc3CJJGV8bFCJIV2zNlrziZ9SiiATzrxA9y3e8zduSwqaTrp0D8ueTj9ELS4RCdnzsdSAlCnqlzZMj3q/MCdAuTmtURp2amV2ry1q1TkXPkMnD2t81jn40ZnuKGpAuHqt7qdnF5HNh4epsHj6DG1sLM6azA2IZ5f5sF6tW8y6w/x3prIm0qPrX0Xnf88picf5+23/p3l9t94w0UYOqfB5es87/16/e+74j76720q0Th7O91ML2I3b9zCA4ykAPtQiDeTTrqguKK6dZukwyzKVlCnTyxilqqSULSVCCW6Dkwqlfvda8a/p01dbPBaPQSwoKIGgsKwpp/xIqIxO8heEIFv71hKAd/ans4TvsbZ0tcmPccJ1V3eda+g8nC8qZc2p0lWdFz662qLzWv2t9P201W3/trZ3sQcEwtQ309jCF95JctOMsnc8736d7/9c47kSsUwoP6fp6r5vrf+f/4V8a1adSbeH/7/9/55/02u/06w/8//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8/5//8";
+const SOUND_KEY = "qai_sound_enabled";
 
-export function playSignalAlert() {
+let currentAudio: HTMLAudioElement | null = null;
+
+export const getSoundEnabled = () => {
+  if (typeof window === 'undefined') return true;
+  return localStorage.getItem(SOUND_KEY) !== "false";
+};
+
+export const setSoundEnabled = (enabled: boolean) => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(SOUND_KEY, enabled.toString());
+};
+
+export function playSignalAlert(loop = true) {
+  if (!getSoundEnabled()) return;
+
   try {
-    const audio = new Audio(PING_SOUND);
-    audio.volume = 0.5; // Not too loud
-    audio.play().catch(e => {
-        console.warn("Audio play blocked (user needs to interact first):", e);
+    // Stop existing if any
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+
+    currentAudio = new Audio(PING_SOUND);
+    currentAudio.volume = 0.5; 
+    currentAudio.loop = loop; // Loop by default for "Alarm" effect until closed
+    
+    currentAudio.play().catch(e => {
+        console.warn("Audio play blocked:", e);
     });
   } catch (error) {
     console.error("Audio Alert Error:", error);
   }
+}
+
+export function stopSignalAlert() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+    }
 }
