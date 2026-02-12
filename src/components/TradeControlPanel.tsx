@@ -8,6 +8,7 @@ import { ArrowUp, ArrowDown, BrainCircuit } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTerminal, Position } from "@/core/context";
 import { Candle } from "@/core/market";
+import { ASSETS } from "@/core/config";
 
 export function TradeControlPanel() {
   const { 
@@ -41,16 +42,16 @@ export function TradeControlPanel() {
         {/* Asset Config */}
         <div className="space-y-3">
              <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Target Asset</label>
-             <div className="grid grid-cols-2 gap-2">
-                 {["BTCUSDT", "ETHUSDT"].map(a => (
+             <div className="grid grid-cols-3 gap-2">
+                 {ASSETS.map(a => (
                      <Button 
-                        key={a} value={a} 
-                        variant={asset === a ? "default" : "outline"}
-                        className={cn("h-8 text-xs font-mono", asset === a ? "bg-white text-black" : "bg-transparent text-zinc-400")}
-                        onClick={() => setAsset(a)}
+                        key={a.symbol} value={a.symbol} 
+                        variant={asset === a.symbol ? "default" : "outline"}
+                        className={cn("h-8 text-[10px] font-mono relative", asset === a.symbol ? "bg-white text-black" : "bg-transparent text-zinc-400")}
+                        onClick={() => setAsset(a.symbol)}
                         disabled={isLocked}
                      >
-                         {a}
+                         {a.symbol.replace("USDT", "")}
                      </Button>
                  ))}
              </div>

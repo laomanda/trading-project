@@ -3,6 +3,7 @@
 import { useTerminal } from "@/core/context";
 
 import { cn, formatIDR } from "@/core/format";
+import { ASSETS } from "@/core/config";
 import { calcEMA, calcRSI } from "@/core/indicators";
 import { Activity, ArrowDown, ArrowUp, ChevronDown, Wand2, Power, Layers, Volume2, VolumeX } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -146,44 +147,43 @@ export function ControlPanel() {
         {/* ASSET SELECTOR */}
         <div>
             <h2 className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Target Asset</h2>
-            <div className="space-y-1.5">
-                <button 
-                    onClick={() => setAsset('BTCUSDT')} 
-                    className={cn(
-                        "w-full text-left px-3 py-3 rounded-lg border transition-all flex items-center justify-between group",
-                        asset === 'BTCUSDT' 
-                            ? "bg-zinc-100 border-zinc-100 shadow-[0_0_10px_rgba(255,255,255,0.1)]" 
-                            : "bg-black/40 border-white/5 hover:border-white/20 hover:bg-white/5"
-                    )}
-                >
-                    <div className="flex items-center gap-3">
-                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold", asset === 'BTCUSDT' ? "bg-black text-white" : "bg-zinc-800 text-zinc-400 group-hover:text-white")}>₿</div>
-                        <div className="flex flex-col">
-                            <span className={cn("text-xs font-bold leading-none", asset === 'BTCUSDT' ? "text-black" : "text-zinc-300")}>BTC/USDT</span>
-                            <span className="text-[9px] text-zinc-500 font-mono">Bitcoin</span>
-                        </div>
-                    </div>
-                    {asset === 'BTCUSDT' && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                </button>
+            <div className="space-y-1.5 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
+                {ASSETS.map(a => {
+                    const isActive = asset === a.symbol;
+                    const colorMap: Record<string, { active: string; dot: string; icon: string }> = {
+                        emerald: { active: "bg-zinc-100 border-zinc-100", dot: "bg-emerald-500", icon: "bg-black text-white" },
+                        blue: { active: "bg-zinc-100 border-zinc-100", dot: "bg-blue-500", icon: "bg-black text-white" },
+                        yellow: { active: "bg-zinc-100 border-zinc-100", dot: "bg-yellow-500", icon: "bg-black text-white" },
+                        violet: { active: "bg-zinc-100 border-zinc-100", dot: "bg-violet-500", icon: "bg-black text-white" },
+                        cyan: { active: "bg-zinc-100 border-zinc-100", dot: "bg-cyan-500", icon: "bg-black text-white" },
+                        teal: { active: "bg-zinc-100 border-zinc-100", dot: "bg-teal-500", icon: "bg-black text-white" },
+                    };
+                    const colors = colorMap[a.color] || colorMap.emerald;
 
-                <button 
-                    onClick={() => setAsset('ETHUSDT')}
-                    className={cn(
-                        "w-full text-left px-3 py-3 rounded-lg border transition-all flex items-center justify-between group",
-                        asset === 'ETHUSDT' 
-                            ? "bg-zinc-100 border-zinc-100 shadow-[0_0_10px_rgba(255,255,255,0.1)]" 
-                            : "bg-black/40 border-white/5 hover:border-white/20 hover:bg-white/5"
-                    )}
-                >
-                    <div className="flex items-center gap-3">
-                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold", asset === 'ETHUSDT' ? "bg-black text-white" : "bg-zinc-800 text-zinc-400 group-hover:text-white")}>Ξ</div>
-                        <div className="flex flex-col">
-                            <span className={cn("text-xs font-bold leading-none", asset === 'ETHUSDT' ? "text-black" : "text-zinc-300")}>ETH/USDT</span>
-                            <span className="text-[9px] text-zinc-500 font-mono">Ethereum</span>
-                        </div>
-                    </div>
-                    {asset === 'ETHUSDT' && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
-                </button>
+                    return (
+                        <button 
+                            key={a.symbol}
+                            onClick={() => setAsset(a.symbol)} 
+                            className={cn(
+                                "w-full text-left px-3 py-2.5 rounded-lg border transition-all flex items-center justify-between group",
+                                isActive 
+                                    ? `${colors.active} shadow-[0_0_10px_rgba(255,255,255,0.1)]` 
+                                    : "bg-black/40 border-white/5 hover:border-white/20 hover:bg-white/5"
+                            )}
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold", isActive ? colors.icon : "bg-zinc-800 text-zinc-400 group-hover:text-white")}>{a.icon}</div>
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className={cn("text-xs font-bold leading-none", isActive ? "text-black" : "text-zinc-300")}>{a.label}</span>
+                                    </div>
+                                    <span className="text-[9px] text-zinc-500 font-mono">{a.name}</span>
+                                </div>
+                            </div>
+                            {isActive && <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", colors.dot)} />}
+                        </button>
+                    );
+                })}
             </div>
         </div>
 

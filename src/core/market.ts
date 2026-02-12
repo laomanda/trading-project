@@ -55,7 +55,7 @@ export function useMarketData() {
     const loadHistory = async () => {
         setConnectionStatus("CONNECTING");
         try {
-            // Use local proxy to avoid CORS
+            // Use local proxy to avoid CORS (API auto-detects spot vs futures)
             const res = await fetch(`/api/market/kline?symbol=${asset.toUpperCase()}&interval=${timeframe}&limit=500`);
             if (!res.ok) throw new Error("REST API Error");
             
@@ -140,10 +140,14 @@ export function useMarketData() {
     };
 
     const connectWS = (endpointIndex = 0) => {
+        // Try all endpoints: Spot first, then Futures fallback
+        // Assets on Spot (BTC, ETH, BNB, SOL) connect via spot WS
+        // Assets only on Futures (HYPE, FARTCOIN) auto-fallback to fstream
         const wsEndpoints = [
             "wss://stream.binance.com:9443",
             "wss://stream.binance.com:443",
             "wss://data-stream.binance.vision",
+            "wss://fstream.binance.com",
         ];
 
         if (endpointIndex >= wsEndpoints.length) {
